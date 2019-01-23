@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ContApp</string>
+    <string name="furnizori_spinner_text_view">Furnizori:</string>
 </resources>
