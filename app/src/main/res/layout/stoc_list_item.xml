@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorPrimaryLight"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/stoc_list_nume_produs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/ListNameField"
+                android:text="default"/>
+
+            <TextView
+                android:id="@+id/stoc_list_produs_stoc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/ListDetailsFields"
+                android:text="test"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/list_divider" />
+    </LinearLayout>
+
+</FrameLayout>

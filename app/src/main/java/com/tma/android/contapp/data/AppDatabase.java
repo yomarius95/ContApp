@@ -8,7 +8,11 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.util.Log;
 
-@Database(entities = {Produs.class, Nir.class, Furnizor.class}, version = 1, exportSchema = false)
+import com.tma.android.contapp.data.DAO.FurnizorDao;
+import com.tma.android.contapp.data.DAO.NirDao;
+import com.tma.android.contapp.data.DAO.ProdusDao;
+
+@Database(entities = {Produs.class, Nir.class, Furnizor.class}, version = 5, exportSchema = false)
 @TypeConverters({DateConverter.class, ArrayListConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -23,10 +27,15 @@ public abstract class AppDatabase extends RoomDatabase {
                 Log.d(LOG_TAG, "Creating new database instance");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         AppDatabase.class, AppDatabase.DATABASE_NAME)
+                        .fallbackToDestructiveMigration()
                         .build();
             }
         }
         Log.d(LOG_TAG, "Getting the database instance");
         return sInstance;
     }
+
+    public abstract FurnizorDao furnizorDao();
+    public abstract ProdusDao produsDao();
+    public abstract NirDao nirDao();
 }

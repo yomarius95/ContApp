@@ -7,14 +7,13 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.tma.android.contapp.data.Produs;
-
-import java.util.ArrayList;
+import java.util.List;
 
 @Dao
 public interface ProdusDao {
 
     @Query("SELECT * FROM produs ORDER BY nume")
-    ArrayList<Produs> loadAllProduse();
+    List<Produs> loadAllProduse();
 
     @Insert
     void insertProdus(Produs produs);
@@ -24,4 +23,10 @@ public interface ProdusDao {
 
     @Delete
     void deleteProdus(Produs produs);
+
+    @Query("SELECT * FROM produs WHERE cuiFurnizor = :cuiFurnizor")
+    List<Produs> loadAllProduseByCui(String cuiFurnizor);
+
+    @Query("SELECT * FROM produs WHERE nume = :nume")
+    Produs loadProdusByNume(String nume);
 }
