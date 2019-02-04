@@ -17,12 +17,16 @@ import java.util.Locale;
                                                         childColumns = "cuiFurnizor"))
 public class Produs implements Parcelable {
 
-    private static final int COTA_TVA_0 = 0;
-    private static final int COTA_TVA_5 = 1;
-    private static final int COTA_TVA_9 = 2;
-    private static final int COTA_TVA_19 = 3;
-    private static final int COTA_TVA_20 = 4;
-    private static final int COTA_TVA_24 = 5;
+    public static final int UNITATE_MASURA_BUC = 0;
+    public static final int UNITATE_MASURA_KG = 1;
+    public static final int UNITTE_MASURA_M = 2;
+
+    public static final int COTA_TVA_0 = 0;
+    public static final int COTA_TVA_5 = 1;
+    public static final int COTA_TVA_9 = 2;
+    public static final int COTA_TVA_19 = 3;
+    public static final int COTA_TVA_20 = 4;
+    public static final int COTA_TVA_24 = 5;
 
     @PrimaryKey(autoGenerate = true)
     private int id;

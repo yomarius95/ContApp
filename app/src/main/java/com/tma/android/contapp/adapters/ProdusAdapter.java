@@ -16,18 +16,22 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.tma.android.contapp.data.Produs.*;
+
 public class ProdusAdapter extends RecyclerView.Adapter<ProdusAdapter.ProdusAdapterViewHolder> {
 
     private ArrayList<Produs> mProdus;
 
     private final ProdusItemClickListener mClickHandler;
+    private Context mContext;
 
     public interface ProdusItemClickListener {
         void onProdusItemClick(Produs clickedProdus);
     }
 
-    public ProdusAdapter(ProdusItemClickListener listener) {
+    public ProdusAdapter(ProdusItemClickListener listener, Context context) {
         mClickHandler = listener;
+        mContext = context;
     }
 
     @NonNull
@@ -76,8 +80,38 @@ public class ProdusAdapter extends RecyclerView.Adapter<ProdusAdapter.ProdusAdap
             pretIntrareProdus.setText(String.valueOf(mProdus.get(listItemIndex).getPretIntrare()));
             stocProdus.setText(String.valueOf(mProdus.get(listItemIndex).getCantitate()));
             pretIesireProdus.setText(String.valueOf(mProdus.get(listItemIndex).getPretIesire()));
-            unitateMasuraProdus.setText(String.valueOf(mProdus.get(listItemIndex).getUnitateMasura()));
-            categorieTvaProdus.setText(String.valueOf(mProdus.get(listItemIndex).getCategorieTVA()));
+            switch (mProdus.get(listItemIndex).getUnitateMasura()) {
+                case UNITATE_MASURA_BUC:
+                    unitateMasuraProdus.setText(mContext.getString(R.string.unitate_masura_buc));
+                    break;
+                case UNITATE_MASURA_KG:
+                    unitateMasuraProdus.setText(mContext.getString(R.string.unitate_masura_kg));
+                    break;
+                case UNITTE_MASURA_M:
+                    unitateMasuraProdus.setText(mContext.getString(R.string.unitate_masura_metru));
+                    break;
+            }
+
+            switch (mProdus.get(listItemIndex).getCategorieTVA()) {
+                case COTA_TVA_0:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_0));
+                    break;
+                case COTA_TVA_5:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_5));
+                    break;
+                case COTA_TVA_9:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_9));
+                    break;
+                case COTA_TVA_19:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_19));
+                    break;
+                case COTA_TVA_20:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_20));
+                    break;
+                case COTA_TVA_24:
+                    categorieTvaProdus.setText(mContext.getString(R.string.categorie_tva_24));
+                    break;
+            }
 
             itemView.setOnClickListener(this);
         }

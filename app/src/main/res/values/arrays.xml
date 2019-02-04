@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_categorie_tva">
+        <item>@string/categorie_tva_default</item>
+        <item>@string/categorie_tva_0</item>
+        <item>@string/categorie_tva_5</item>
+        <item>@string/categorie_tva_9</item>
+        <item>@string/categorie_tva_19</item>
+        <item>@string/categorie_tva_20</item>
+        <item>@string/categorie_tva_24</item>
+    </string-array>
+    <string-array name="array_unitate_masura">
+        <item>@string/unitate_masura_default</item>
+        <item>@string/unitate_masura_buc</item>
+        <item>@string/unitate_masura_kg</item>
+        <item>@string/unitate_masura_metru</item>
+    </string-array>
+</resources>

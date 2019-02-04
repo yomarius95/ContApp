@@ -82,7 +82,7 @@ public class ProdusFragment extends Fragment implements ProdusAdapter.ProdusItem
         mProdusList.setLayoutManager(layoutManager);
         mProdusList.setHasFixedSize(true);
 
-        mAdapter = new ProdusAdapter(this);
+        mAdapter = new ProdusAdapter(this, getContext());
 
         mProdusList.setAdapter(mAdapter);
 
