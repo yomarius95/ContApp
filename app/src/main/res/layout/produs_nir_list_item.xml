@@ -29,6 +29,13 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/ListItemDescription"
+                    android:text="Cantitate: "/>
+
+                <TextView
                     android:id="@+id/cantitate_produs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -43,18 +50,34 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    style="@style/ListItemDescription"
+                    android:text="Total aprovizionare: "/>
+
+                <TextView
                     android:id="@+id/total_aprovizionare_produs"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="4"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
                     style="@style/ListDetailsFields"
                     android:text="test"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    style="@style/ListItemDescription"
+                    android:text="Total vanzare: "/>
 
                 <TextView
                     android:id="@+id/total_vanzare_produs"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
                     style="@style/ListDetailsFields"
                     android:text="test"/>
             </LinearLayout>

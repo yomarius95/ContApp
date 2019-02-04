@@ -92,6 +92,8 @@ public class EditorProdusNirFragment extends Fragment {
                 indexProdusNir = bundle.getInt(INDEX_PRODUS_NIR);
             }
 
+            mDb = AppDatabase.getInstance(getContext());
+
             if (!mEditorMode) {
                 mProdus = bundle.getParcelable(CLICKED_ITEM);
                 mUnitateMasura.setText(String.valueOf(mProdus.getUnitateMasura()));
@@ -102,10 +104,31 @@ public class EditorProdusNirFragment extends Fragment {
                 mPretIesire.setSelection(mPretIesire.getText().length());
                 mStoc.setText(String.valueOf(mProdus.getCantitate()));
                 mStoc.setSelection(mStoc.getText().length());
+
+                spinnerNameArray = new String[] {mProdus.getNume()};
+                setupSpinnerEdit();
+                mSpinnerProdus.setEnabled(false);
+            } else {
+                AppExecutors.getsInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        final ArrayList<Produs> produs = (ArrayList<Produs>) mDb.produsDao().loadAllProduseByCui(mCuiFurnizor);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                spinnerNameArray = new String[produs.size()];
+
+                                for (int i = 0; i < produs.size(); i++) {
+                                    spinnerNameArray[i] = produs.get(i).getNume();
+                                }
+
+                                setupSpinner();
+                            }
+                        });
+                    }
+                });
             }
         }
-
-        mDb = AppDatabase.getInstance(getContext());
 
         return rootView;
     }
@@ -195,24 +218,7 @@ public class EditorProdusNirFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        AppExecutors.getsInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                final ArrayList<Produs> produs = (ArrayList<Produs>) mDb.produsDao().loadAllProduseByCui(mCuiFurnizor);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        spinnerNameArray = new String[produs.size()];
 
-                        for (int i = 0; i < produs.size(); i++) {
-                            spinnerNameArray[i] = produs.get(i).getNume();
-                        }
-
-                        setupSpinner();
-                    }
-                });
-            }
-        });
     }
 
     private void setupSpinner() {
@@ -246,8 +252,6 @@ public class EditorProdusNirFragment extends Fragment {
                                     mPretIntrare.setSelection(mPretIntrare.getText().length());
                                     mPretIesire.setText(String.valueOf(produs.getPretIesire()));
                                     mPretIesire.setSelection(mPretIesire.getText().length());
-                                    mStoc.setText(String.valueOf(produs.getCantitate()));
-                                    mStoc.setSelection(mStoc.getText().length());
                                 }
                             });
                         }
@@ -263,6 +267,17 @@ public class EditorProdusNirFragment extends Fragment {
                 index = -1;
             }
         });
+    }
+
+    private void setupSpinnerEdit() {
+        ArrayAdapter<String> produsSpinnerAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_item, spinnerNameArray);
+
+        // Specify dropdown layout style - simple list view with 1 item per line
+        produsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
+        // Apply the adapter to the spinner
+        mSpinnerProdus.setAdapter(produsSpinnerAdapter);
     }
 
 }

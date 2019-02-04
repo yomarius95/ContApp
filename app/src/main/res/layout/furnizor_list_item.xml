@@ -23,19 +23,41 @@
                 style="@style/ListNameField"
                 android:text="default"/>
 
-            <TextView
-                android:id="@+id/localitate_furnizor"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/ListDetailsFields"
-                android:text="test"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/ListItemDescription"
+                    android:text="Localitate: "/>
 
-            <TextView
-                android:id="@+id/cui_furnizor"
+                <TextView
+                    android:id="@+id/localitate_furnizor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/ListDetailsFields"
+                    android:text="test"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/ListDetailsFields"
-                android:text="test"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/ListItemDescription"
+                    android:text="Cui: "/>
+
+                <TextView
+                    android:id="@+id/cui_furnizor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/ListDetailsFields"
+                    android:text="test"/>
+            </LinearLayout>
         </LinearLayout>
 
         <View

@@ -207,6 +207,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
     }
 
     private void deleteNir() {
+        updateStoc(false);
         AppExecutors.getsInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
