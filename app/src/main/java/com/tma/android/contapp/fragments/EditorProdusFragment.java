@@ -1,5 +1,7 @@
 package com.tma.android.contapp.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.tma.android.contapp.AppExecutors;
+import com.tma.android.contapp.EditorActivity;
 import com.tma.android.contapp.R;
 import com.tma.android.contapp.data.AppDatabase;
 import com.tma.android.contapp.data.Produs;
@@ -53,6 +57,16 @@ public class EditorProdusFragment extends Fragment {
     private Produs mProdus;
     private String mCuiFurnizorProdus;
 
+    private boolean mProdusHasChanged = false;
+
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mProdusHasChanged = true;
+            return false;
+        }
+    };
+
     public EditorProdusFragment() {
 
     }
@@ -80,6 +94,7 @@ public class EditorProdusFragment extends Fragment {
             }
 
             if (!mEditorMode) {
+                getActivity().setTitle(R.string.editor_produs_title_edit_produs);
                 mProdus = bundle.getParcelable(CLICKED_ITEM);
                 mCuiFurnizorProdus = mProdus.getCuiFurnizor();
                 mNumeProdus.setText(mProdus.getNume());
@@ -92,8 +107,38 @@ public class EditorProdusFragment extends Fragment {
                 mPretIesire.setSelection(mPretIesire.getText().length());
                 mStoc.setText(String.valueOf(mProdus.getCantitate()));
                 mStoc.setSelection(mStoc.getText().length());
+                mStoc.setEnabled(false);
+            } else {
+                getActivity().setTitle(R.string.editor_produs_title_add_produs);
             }
         }
+
+        mNumeProdus.setOnTouchListener(mTouchListener);
+        mUnitateMasuraSpinner.setOnTouchListener(mTouchListener);
+        mPretIntrare.setOnTouchListener(mTouchListener);
+        mPretIesire.setOnTouchListener(mTouchListener);
+        mCategorieTVASpinner.setOnTouchListener(mTouchListener);
+        mStoc.setOnTouchListener(mTouchListener);
+
+        ((EditorActivity) getActivity()).setOnBackClickListener(new EditorActivity.OnBackClickListener() {
+            @Override
+            public boolean onBackClick() {
+                if (!mProdusHasChanged) {
+                    return false;
+                }
+
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                getActivity().finish();
+                            }
+                        };
+
+                showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+            }
+        });
 
         return rootView;
     }
@@ -121,8 +166,7 @@ public class EditorProdusFragment extends Fragment {
                 getActivity().finish();
                 return true;
             case R.id.delete_produs:
-                deleteProdus();
-                getActivity().finish();
+                showDeleteConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -162,6 +206,8 @@ public class EditorProdusFragment extends Fragment {
                 mDb.produsDao().deleteProdus(mProdus);
             }
         });
+
+        getActivity().finish();
     }
 
     private void setupSpinner() {
@@ -237,5 +283,42 @@ public class EditorProdusFragment extends Fragment {
                 mCategorieTVA = -1;
             }
         });
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.delete_produs_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteProdus();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

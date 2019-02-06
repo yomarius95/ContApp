@@ -27,6 +27,16 @@ public class EditorActivity extends AppCompatActivity {
     public static final String FRAGMENT_EDITOR_MODE = "fragment_editor_mode";
     public static final String CLICKED_ITEM = "clicked_item";
 
+    public interface OnBackClickListener {
+        boolean onBackClick();
+    }
+
+    private OnBackClickListener onBackClickListener;
+
+    public void setOnBackClickListener(OnBackClickListener onBackClickListener) {
+        this.onBackClickListener = onBackClickListener;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,5 +111,13 @@ public class EditorActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (onBackClickListener != null && onBackClickListener.onBackClick()) {
+            return;
+        }
+        super.onBackPressed();
     }
 }

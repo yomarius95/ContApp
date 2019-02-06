@@ -1,6 +1,8 @@
 package com.tma.android.contapp.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tma.android.contapp.AppExecutors;
+import com.tma.android.contapp.EditorActivity;
 import com.tma.android.contapp.R;
 import com.tma.android.contapp.data.AppDatabase;
 import com.tma.android.contapp.data.Furnizor;
@@ -66,6 +70,16 @@ public class EditorProdusNirFragment extends Fragment {
     private String mCuiFurnizor;
     private int indexProdusNir;
 
+    private boolean mProdusHasChanged = false;
+
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mProdusHasChanged = true;
+            return false;
+        }
+    };
+
     public EditorProdusNirFragment() {
 
     }
@@ -95,6 +109,7 @@ public class EditorProdusNirFragment extends Fragment {
             mDb = AppDatabase.getInstance(getContext());
 
             if (!mEditorMode) {
+                getActivity().setTitle(R.string.editor_produs_nir_title_edit_produs);
                 mProdus = bundle.getParcelable(CLICKED_ITEM);
                 mUnitateMasura.setText(String.valueOf(mProdus.getUnitateMasura()));
                 mCategorieTVA.setText(String.valueOf(mProdus.getCategorieTVA()));
@@ -109,6 +124,7 @@ public class EditorProdusNirFragment extends Fragment {
                 setupSpinnerEdit();
                 mSpinnerProdus.setEnabled(false);
             } else {
+                getActivity().setTitle(R.string.editor_produs_nir_title_add_produs);
                 AppExecutors.getsInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -129,6 +145,30 @@ public class EditorProdusNirFragment extends Fragment {
                 });
             }
         }
+
+        mPretIntrare.setOnTouchListener(mTouchListener);
+        mPretIesire.setOnTouchListener(mTouchListener);
+        mStoc.setOnTouchListener(mTouchListener);
+
+        ((EditorActivity) getActivity()).setOnBackClickListener(new EditorActivity.OnBackClickListener() {
+            @Override
+            public boolean onBackClick() {
+                if (!mProdusHasChanged) {
+                    return false;
+                }
+
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                getActivity().finish();
+                            }
+                        };
+
+                showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+            }
+        });
 
         return rootView;
     }
@@ -157,8 +197,7 @@ public class EditorProdusNirFragment extends Fragment {
                 return true;
 
             case R.id.delete_produs_nir:
-                deleteProdusNir();
-                getActivity().finish();
+                showDeleteConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -278,6 +317,44 @@ public class EditorProdusNirFragment extends Fragment {
 
         // Apply the adapter to the spinner
         mSpinnerProdus.setAdapter(produsSpinnerAdapter);
+
+        index = 0;
     }
 
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.delete_produs_nir_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteProdusNir();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

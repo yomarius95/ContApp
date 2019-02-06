@@ -1,5 +1,7 @@
 package com.tma.android.contapp.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -80,6 +83,16 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
 
     private ArrayList<Produs> mListaProduse = new ArrayList<>();;
 
+    private boolean mNirHasChanged = false;
+
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mNirHasChanged = true;
+            return false;
+        }
+    };
+
     public EditorNirFragment() {
 
     }
@@ -105,6 +118,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
             }
 
             if (!mEditorMode) {
+                getActivity().setTitle(R.string.editor_nir_title_edit_nir);
                 mNir = bundle.getParcelable(CLICKED_ITEM);
                 mCuiFurnizorNir = mNir.getCuiFurnizor();
                 mNumeFurnizor.setText(mNir.getNumeFurnizor());
@@ -120,8 +134,36 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 mDataActNir.setText(mNir.getDataAct());
                 mDataActNir.setSelection(mDataActNir.getText().length());
                 mListaProduse = mNir.getListaProduse();
+            } else {
+                getActivity().setTitle(R.string.editor_nir_title_add_nir);
             }
         }
+
+        mNumarNir.setOnTouchListener(mTouchListener);
+        mDataNir.setOnTouchListener(mTouchListener);
+        mSerieActNir.setOnTouchListener(mTouchListener);
+        mNumarActNir.setOnTouchListener(mTouchListener);
+        mDataActNir.setOnTouchListener(mTouchListener);
+
+        ((EditorActivity) getActivity()).setOnBackClickListener(new EditorActivity.OnBackClickListener() {
+            @Override
+            public boolean onBackClick() {
+                if (!mNirHasChanged) {
+                    return false;
+                }
+
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                getActivity().finish();
+                            }
+                        };
+
+                showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+            }
+        });
 
         fabProdusNir.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -171,8 +213,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 return true;
 
             case R.id.delete_nir:
-                deleteNir();
-                getActivity().finish();
+                showDeleteConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -214,6 +255,8 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 mDb.nirDao().deleteNir(mNir);
             }
         });
+
+        getActivity().finish();
     }
 
 
@@ -259,6 +302,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 Produs produs = data.getParcelableExtra(RESULT_PRODUS);
                 mListaProduse.add(produs);
                 mAdapter.setProdusData(mListaProduse);
+                mNirHasChanged = true;
             }
         }
 
@@ -271,6 +315,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                     mListaProduse.remove(position);
                     mListaProduse.add(position, produs);
                     mAdapter.setProdusData(mListaProduse);
+                    mNirHasChanged = true;
                 }
 
             } else if (resultCode == 2) {
@@ -278,8 +323,46 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 if (position != -1) {
                     mListaProduse.remove(position);
                     mAdapter.setProdusData(mListaProduse);
+                    mNirHasChanged = true;
                 }
             }
         }
+    }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.delete_nir_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteNir();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

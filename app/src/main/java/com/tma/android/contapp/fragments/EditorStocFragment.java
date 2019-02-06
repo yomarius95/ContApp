@@ -1,5 +1,7 @@
 package com.tma.android.contapp.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -14,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.tma.android.contapp.AppExecutors;
+import com.tma.android.contapp.EditorActivity;
 import com.tma.android.contapp.R;
 import com.tma.android.contapp.data.AppDatabase;
 import com.tma.android.contapp.data.Produs;
@@ -39,6 +43,16 @@ public class EditorStocFragment extends Fragment {
     private Produs mProdus;
     private String mCuiFurnizorStoc;
 
+    private boolean mStocHasChanged = false;
+
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mStocHasChanged = true;
+            return false;
+        }
+    };
+
     public EditorStocFragment() {
 
     }
@@ -63,6 +77,7 @@ public class EditorStocFragment extends Fragment {
             }
 
             if (!mEditorMode) {
+                getActivity().setTitle(R.string.editor_stoc_title_edit_stoc);
                 mProdus = bundle.getParcelable(CLICKED_ITEM);
                 mCuiFurnizorStoc = mProdus.getCuiFurnizor();
                 mNumeProdus.setText(mProdus.getNume());
@@ -70,6 +85,28 @@ public class EditorStocFragment extends Fragment {
                 mStoc.setSelection(mStoc.getText().length());
             }
         }
+
+        mStoc.setOnTouchListener(mTouchListener);
+
+        ((EditorActivity) getActivity()).setOnBackClickListener(new EditorActivity.OnBackClickListener() {
+            @Override
+            public boolean onBackClick() {
+                if (!mStocHasChanged) {
+                    return false;
+                }
+
+                DialogInterface.OnClickListener discardButtonClickListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                getActivity().finish();
+                            }
+                        };
+
+                showUnsavedChangesDialog(discardButtonClickListener);
+                return true;
+            }
+        });
 
         mDb = AppDatabase.getInstance(getContext());
 
@@ -105,5 +142,22 @@ public class EditorStocFragment extends Fragment {
             }
         });
 
+    }
+
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
