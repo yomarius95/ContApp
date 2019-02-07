@@ -112,6 +112,8 @@ public class ProdusFragment extends Fragment implements ProdusAdapter.ProdusItem
                 });
             }
         });
+
+        mAdapter.setProdusData(new ArrayList<Produs>());
     }
 
     @Override

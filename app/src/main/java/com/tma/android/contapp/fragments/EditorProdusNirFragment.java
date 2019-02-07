@@ -118,7 +118,7 @@ public class EditorProdusNirFragment extends Fragment {
                 mPretIesire.setText(String.valueOf(mProdus.getPretIesire()));
                 mPretIesire.setSelection(mPretIesire.getText().length());
                 mStoc.setText(String.valueOf(mProdus.getCantitate()));
-                mStoc.setSelection(mStoc.getText().length());
+                mStoc.setEnabled(false);
 
                 spinnerNameArray = new String[] {mProdus.getNume()};
                 setupSpinnerEdit();
@@ -217,9 +217,10 @@ public class EditorProdusNirFragment extends Fragment {
         Intent returnIntent = new Intent();
 
         if (mProdus != null) {
-            updateStoc(true, mProdus);
+            produs = new Produs(mProdus.getNume(), mProdus.getUnitateMasura(), stoc, pretIntrare, pretIesire, mProdus.getCategorieTVA(), mCuiFurnizor);
+            updateStoc(true, produs);
             returnIntent.putExtra(INDEX_PRODUS_NIR, indexProdusNir);
-            returnIntent.putExtra(RESULT_PRODUS, mProdus);
+            returnIntent.putExtra(RESULT_PRODUS, produs);
             getActivity().setResult(Activity.RESULT_OK, returnIntent);
         } else {
             updateStoc(true, produs);

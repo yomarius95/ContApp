@@ -10,7 +10,10 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-@Entity(tableName = "nir", indices = {@Index("cuiFurnizor")}, foreignKeys = @ForeignKey(entity = Furnizor.class,
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "nir", indices = {@Index("cuiFurnizor")}, foreignKeys = @ForeignKey(onDelete = CASCADE,
+                                                                                entity = Furnizor.class,
                                                                                 parentColumns = "cui",
                                                                                 childColumns = "cuiFurnizor"))
 public class Nir implements Parcelable {

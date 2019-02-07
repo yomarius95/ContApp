@@ -12,7 +12,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-@Entity(tableName = "produs", indices = {@Index("cuiFurnizor")}, foreignKeys = @ForeignKey(entity = Furnizor.class,
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "produs", indices = {@Index("cuiFurnizor")}, foreignKeys = @ForeignKey(onDelete = CASCADE,
+                                                        entity = Furnizor.class,
                                                         parentColumns = "cui",
                                                         childColumns = "cuiFurnizor"))
 public class Produs implements Parcelable {
