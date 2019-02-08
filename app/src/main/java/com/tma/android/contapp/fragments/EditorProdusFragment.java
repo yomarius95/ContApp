@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,8 @@ import com.tma.android.contapp.EditorActivity;
 import com.tma.android.contapp.R;
 import com.tma.android.contapp.data.AppDatabase;
 import com.tma.android.contapp.data.Produs;
+
+import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -163,7 +166,6 @@ public class EditorProdusFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_produs:
                 saveProdus();
-                getActivity().finish();
                 return true;
             case R.id.delete_produs:
                 showDeleteConfirmationDialog();
@@ -174,29 +176,38 @@ public class EditorProdusFragment extends Fragment {
 
     private void saveProdus() {
         String nume = mNumeProdus.getText().toString().trim();
-        Double pretIntrare = Double.valueOf(mPretIntrare.getText().toString().trim());
-        Double pretIesire = Double.valueOf(mPretIesire.getText().toString().trim());
-        Double stoc = Double.valueOf(mStoc.getText().toString().trim());
+        String pretIntrareString = mPretIntrare.getText().toString().trim();
+        String pretIesireString = mPretIesire.getText().toString().trim();
+        String stocString = mStoc.getText().toString().trim();
 
-
-        final Produs produs;
-
-        if (mProdus != null) {
-            produs = new Produs(mProdus.getId(), nume, mUnitateMasura, stoc, pretIntrare, pretIesire, mCategorieTVA, mCuiFurnizorProdus);
+        if (TextUtils.isEmpty(nume) || TextUtils.isEmpty(pretIntrareString) || TextUtils.isEmpty(pretIesireString) || TextUtils.isEmpty(stocString) || mUnitateMasura == -1 || mCategorieTVA == -1){
+            Toast.makeText(getContext(), "Completati toate campurile", Toast.LENGTH_SHORT).show();
         } else {
-            produs = new Produs(nume, mUnitateMasura, stoc, pretIntrare, pretIesire, mCategorieTVA, mCuiFurnizorProdus);
-        }
+            Double pretIntrare = Double.valueOf(pretIntrareString);
+            Double pretIesire = Double.valueOf(pretIesireString);
+            Double stoc = Double.valueOf(stocString);
 
-        AppExecutors.getsInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (mProdus == null) {
-                    mDb.produsDao().insertProdus(produs);
-                } else {
-                    mDb.produsDao().updateProdus(produs);
-                }
+            final Produs produs;
+
+            if (mProdus != null) {
+                produs = new Produs(mProdus.getId(), nume, mUnitateMasura, stoc, pretIntrare, pretIesire, mCategorieTVA, mCuiFurnizorProdus);
+            } else {
+                produs = new Produs(nume, mUnitateMasura, stoc, pretIntrare, pretIesire, mCategorieTVA, mCuiFurnizorProdus);
             }
-        });
+
+            AppExecutors.getsInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mProdus == null) {
+                        mDb.produsDao().insertProdus(produs);
+                    } else {
+                        mDb.produsDao().updateProdus(produs);
+                    }
+                }
+            });
+
+            getActivity().finish();
+        }
     }
 
     private void deleteProdus() {

@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tma.android.contapp.AppExecutors;
 import com.tma.android.contapp.EditorActivity;
@@ -209,7 +211,6 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
         switch (item.getItemId()) {
             case R.id.save_nir:
                 saveNir();
-                getActivity().finish();
                 return true;
 
             case R.id.delete_nir:
@@ -221,30 +222,39 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
 
     private void saveNir() {
 
-        int numar = Integer.parseInt(mNumarNir.getText().toString().trim());
+        String numarString = mNumarNir.getText().toString().trim();
         String data = mDataNir.getText().toString().trim();
         String dataAct = mDataActNir.getText().toString().trim();
         String serieAct = mSerieActNir.getText().toString().trim();
-        int numarAct = Integer.parseInt(mNumarActNir.getText().toString().trim());
+        String numarActString = mNumarActNir.getText().toString().trim();
 
-        final Nir nir;
-
-        if (mNir != null) {
-            nir = new Nir(mNir.getId(), numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
+        if (TextUtils.isEmpty(numarString) || TextUtils.isEmpty(data) || TextUtils.isEmpty(dataAct) || TextUtils.isEmpty(serieAct) || TextUtils.isEmpty(numarActString)) {
+            Toast.makeText(getContext(), "Completati toate campurile", Toast.LENGTH_SHORT).show();
         } else {
-            nir = new Nir(numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
-        }
+            int numar = Integer.parseInt(numarString);
+            int numarAct = Integer.parseInt(numarActString);
 
-        AppExecutors.getsInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (mNir == null) {
-                    mDb.nirDao().insertNir(nir);
-                } else {
-                    mDb.nirDao().updateNir(nir);
-                }
+            final Nir nir;
+
+            if (mNir != null) {
+                nir = new Nir(mNir.getId(), numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
+            } else {
+                nir = new Nir(numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
             }
-        });
+
+            AppExecutors.getsInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mNir == null) {
+                        mDb.nirDao().insertNir(nir);
+                    } else {
+                        mDb.nirDao().updateNir(nir);
+                    }
+                }
+            });
+
+            getActivity().finish();
+        }
     }
 
     private void deleteNir() {

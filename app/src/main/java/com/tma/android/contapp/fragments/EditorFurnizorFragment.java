@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.tma.android.contapp.AppExecutors;
 import com.tma.android.contapp.EditorActivity;
@@ -135,7 +137,6 @@ public class EditorFurnizorFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_furnizor:
                 saveFurnizor();
-                getActivity().finish();
                 return true;
             case R.id.delete_furnizor:
                 showDeleteConfirmationDialog();
@@ -149,18 +150,25 @@ public class EditorFurnizorFragment extends Fragment {
         String localitate = mLocalitateFurnizor.getText().toString().trim();
         String cui = mCuiFurnizor.getText().toString().trim();
 
-        final Furnizor furnizor = new Furnizor(cui, nume, localitate);
+        if (TextUtils.isEmpty(nume) || TextUtils.isEmpty(localitate) || TextUtils.isEmpty(cui)) {
+            Toast.makeText(getContext(), "Completati toate campurile", Toast.LENGTH_SHORT).show();
+        } else {
+            final Furnizor furnizor = new Furnizor(cui, nume, localitate);
 
-        AppExecutors.getsInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (mEditorMode) {
-                    mDb.furnizorDao().insertFurnizor(furnizor);
-                } else {
-                    mDb.furnizorDao().updateFurnizor(furnizor);
+            AppExecutors.getsInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (mEditorMode) {
+                        mDb.furnizorDao().insertFurnizor(furnizor);
+                    } else {
+                        mDb.furnizorDao().updateFurnizor(furnizor);
+                    }
                 }
-            }
-        });
+            });
+
+            getActivity().finish();
+        }
+
     }
 
     private void deleteFurnizor() {

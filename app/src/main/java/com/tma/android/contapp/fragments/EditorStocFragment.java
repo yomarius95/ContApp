@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tma.android.contapp.AppExecutors;
 import com.tma.android.contapp.EditorActivity;
@@ -124,23 +126,30 @@ public class EditorStocFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_stoc:
                 saveStoc();
-                getActivity().finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void saveStoc() {
-        Double stoc = Double.valueOf(mStoc.getText().toString().trim());
+        String stocString = mStoc.getText().toString().trim();
 
-        final Produs produs = new Produs(mProdus.getId(), mProdus.getNume(), 1, stoc, mProdus.getPretIntrare(), mProdus.getPretIesire(), 1, mCuiFurnizorStoc);
+        if (TextUtils.isEmpty(stocString)) {
+            Toast.makeText(getContext(), "Completati toate campurile", Toast.LENGTH_SHORT).show();
+        } else {
+            Double stoc = Double.valueOf(mStoc.getText().toString().trim());
 
-        AppExecutors.getsInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mDb.produsDao().updateProdus(produs);
-            }
-        });
+            final Produs produs = new Produs(mProdus.getId(), mProdus.getNume(), 1, stoc, mProdus.getPretIntrare(), mProdus.getPretIesire(), 1, mCuiFurnizorStoc);
+
+            AppExecutors.getsInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.produsDao().updateProdus(produs);
+                }
+            });
+
+            getActivity().finish();
+        }
 
     }
 

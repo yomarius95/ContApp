@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tma.android.contapp.AppExecutors;
 import com.tma.android.contapp.EditorActivity;
@@ -39,6 +40,15 @@ import butterknife.ButterKnife;
 
 import static com.tma.android.contapp.EditorActivity.CLICKED_ITEM;
 import static com.tma.android.contapp.EditorActivity.FRAGMENT_EDITOR_MODE;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_0;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_19;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_20;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_24;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_5;
+import static com.tma.android.contapp.data.Produs.COTA_TVA_9;
+import static com.tma.android.contapp.data.Produs.UNITATE_MASURA_BUC;
+import static com.tma.android.contapp.data.Produs.UNITATE_MASURA_KG;
+import static com.tma.android.contapp.data.Produs.UNITTE_MASURA_M;
 import static com.tma.android.contapp.fragments.EditorNirFragment.INDEX_PRODUS_NIR;
 import static com.tma.android.contapp.fragments.EditorNirFragment.RESULT_PRODUS;
 import static com.tma.android.contapp.fragments.ProdusFragment.CUI_FURNIZOR;
@@ -111,8 +121,7 @@ public class EditorProdusNirFragment extends Fragment {
             if (!mEditorMode) {
                 getActivity().setTitle(R.string.editor_produs_nir_title_edit_produs);
                 mProdus = bundle.getParcelable(CLICKED_ITEM);
-                mUnitateMasura.setText(String.valueOf(mProdus.getUnitateMasura()));
-                mCategorieTVA.setText(String.valueOf(mProdus.getCategorieTVA()));
+                setUnitateMasuraAndCategorieTVA(mProdus);
                 mPretIntrare.setText(String.valueOf(mProdus.getPretIntrare()));
                 mPretIntrare.setSelection(mPretIntrare.getText().length());
                 mPretIesire.setText(String.valueOf(mProdus.getPretIesire()));
@@ -193,7 +202,6 @@ public class EditorProdusNirFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_produs_nir:
                 saveProdusNir();
-                getActivity().finish();
                 return true;
 
             case R.id.delete_produs_nir:
@@ -206,29 +214,68 @@ public class EditorProdusNirFragment extends Fragment {
     private void saveProdusNir() {
 
         String nume = spinnerNameArray[index];
-        Double pretIntrare = Double.valueOf(mPretIntrare.getText().toString().trim());
-        Double pretIesire = Double.valueOf(mPretIesire.getText().toString().trim());
-        Double stoc = Double.valueOf(mStoc.getText().toString().trim());
-        int unitateMasura = Integer.valueOf(mUnitateMasura.getText().toString().trim());
-        int categorieTva = Integer.valueOf(mCategorieTVA.getText().toString().trim());
+        String pretIntrareString = mPretIntrare.getText().toString().trim();
+        String pretIesireString = mPretIesire.getText().toString().trim();
+        String stocString = mStoc.getText().toString().trim();
 
-        Produs produs = new Produs(nume, unitateMasura, stoc, pretIntrare, pretIesire, categorieTva, mCuiFurnizor);
-
-        Intent returnIntent = new Intent();
-
-        if (mProdus != null) {
-            produs = new Produs(mProdus.getNume(), mProdus.getUnitateMasura(), stoc, pretIntrare, pretIesire, mProdus.getCategorieTVA(), mCuiFurnizor);
-            updateStoc(true, produs);
-            returnIntent.putExtra(INDEX_PRODUS_NIR, indexProdusNir);
-            returnIntent.putExtra(RESULT_PRODUS, produs);
-            getActivity().setResult(Activity.RESULT_OK, returnIntent);
+        if (TextUtils.isEmpty(pretIntrareString) || TextUtils.isEmpty(pretIesireString) || TextUtils.isEmpty(stocString)) {
+            Toast.makeText(getContext(), "Completati toate campurile", Toast.LENGTH_SHORT).show();
         } else {
-            updateStoc(true, produs);
-            returnIntent.putExtra(RESULT_PRODUS, produs);
-            getActivity().setResult(Activity.RESULT_OK, returnIntent);
-        }
+            Double pretIntrare = Double.valueOf(pretIntrareString);
+            Double pretIesire = Double.valueOf(pretIesireString);
+            Double stoc = Double.valueOf(stocString);
+            int unitateMasura = 0;
+            switch (mUnitateMasura.getText().toString().trim()) {
+                case "BUC":
+                    unitateMasura = UNITATE_MASURA_BUC;
+                    break;
+                case "kg":
+                    unitateMasura = UNITATE_MASURA_KG;
+                    break;
+                case "m":
+                    unitateMasura = UNITTE_MASURA_M;
+                    break;
+            }
+            int categorieTva = 0;
+            switch (mCategorieTVA.getText().toString().trim()) {
+                case "0%":
+                    categorieTva = COTA_TVA_0;
+                    break;
+                case "5%":
+                    categorieTva = COTA_TVA_5;
+                    break;
+                case "9%":
+                    categorieTva = COTA_TVA_9;
+                    break;
+                case "19%":
+                    categorieTva = COTA_TVA_19;
+                    break;
+                case "20%":
+                    categorieTva = COTA_TVA_20;
+                    break;
+                case "24%":
+                    categorieTva = COTA_TVA_24;
+                    break;
+            }
 
-        getActivity().finish();
+            Produs produs = new Produs(nume, unitateMasura, stoc, pretIntrare, pretIesire, categorieTva, mCuiFurnizor);
+
+            Intent returnIntent = new Intent();
+
+            if (mProdus != null) {
+                produs = new Produs(mProdus.getNume(), mProdus.getUnitateMasura(), stoc, pretIntrare, pretIesire, mProdus.getCategorieTVA(), mCuiFurnizor);
+                updateStoc(true, produs);
+                returnIntent.putExtra(INDEX_PRODUS_NIR, indexProdusNir);
+                returnIntent.putExtra(RESULT_PRODUS, produs);
+                getActivity().setResult(Activity.RESULT_OK, returnIntent);
+            } else {
+                updateStoc(true, produs);
+                returnIntent.putExtra(RESULT_PRODUS, produs);
+                getActivity().setResult(Activity.RESULT_OK, returnIntent);
+            }
+
+            getActivity().finish();
+        }
     }
 
     private void deleteProdusNir() {
@@ -286,8 +333,7 @@ public class EditorProdusNirFragment extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mUnitateMasura.setText(String.valueOf(produs.getUnitateMasura()));
-                                    mCategorieTVA.setText(String.valueOf(produs.getCategorieTVA()));
+                                    setUnitateMasuraAndCategorieTVA(produs);
                                     mPretIntrare.setText(String.valueOf(produs.getPretIntrare()));
                                     mPretIntrare.setSelection(mPretIntrare.getText().length());
                                     mPretIesire.setText(String.valueOf(produs.getPretIesire()));
@@ -307,6 +353,41 @@ public class EditorProdusNirFragment extends Fragment {
                 index = -1;
             }
         });
+    }
+
+    private void setUnitateMasuraAndCategorieTVA(Produs produs) {
+        switch (produs.getUnitateMasura()) {
+            case UNITATE_MASURA_BUC:
+                mUnitateMasura.setText(getContext().getString(R.string.unitate_masura_buc));
+                break;
+            case UNITATE_MASURA_KG:
+                mUnitateMasura.setText(getContext().getString(R.string.unitate_masura_kg));
+                break;
+            case UNITTE_MASURA_M:
+                mUnitateMasura.setText(getContext().getString(R.string.unitate_masura_metru));
+                break;
+        }
+
+        switch (produs.getCategorieTVA()) {
+            case COTA_TVA_0:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_0));
+                break;
+            case COTA_TVA_5:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_5));
+                break;
+            case COTA_TVA_9:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_9));
+                break;
+            case COTA_TVA_19:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_19));
+                break;
+            case COTA_TVA_20:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_20));
+                break;
+            case COTA_TVA_24:
+                mCategorieTVA.setText(getContext().getString(R.string.categorie_tva_24));
+                break;
+        }
     }
 
     private void setupSpinnerEdit() {
