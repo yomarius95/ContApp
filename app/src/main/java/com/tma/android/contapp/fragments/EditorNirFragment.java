@@ -21,21 +21,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.itextpdf.text.DocumentException;
 import com.tma.android.contapp.AppExecutors;
 import com.tma.android.contapp.EditorActivity;
+import com.tma.android.contapp.PdfCreator;
 import com.tma.android.contapp.R;
-import com.tma.android.contapp.adapters.NirAdapter;
 import com.tma.android.contapp.adapters.ProdusNirAdapter;
 import com.tma.android.contapp.data.AppDatabase;
-import com.tma.android.contapp.data.DateConverter;
-import com.tma.android.contapp.data.Furnizor;
 import com.tma.android.contapp.data.Nir;
 import com.tma.android.contapp.data.Produs;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +41,7 @@ import static android.app.Activity.RESULT_OK;
 import static com.tma.android.contapp.EditorActivity.CLICKED_ITEM;
 import static com.tma.android.contapp.EditorActivity.FRAGMENT_EDITOR_MODE;
 import static com.tma.android.contapp.EditorActivity.FRAGMENT_TO_OPEN;
+import static com.tma.android.contapp.fragments.NirFragment.LOCALITATE_FURNIZOR;
 import static com.tma.android.contapp.fragments.NirFragment.NUME_FURNIZOR;
 import static com.tma.android.contapp.fragments.ProdusFragment.CUI_FURNIZOR;
 
@@ -82,6 +80,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
     private Nir mNir;
     private String mCuiFurnizorNir;
     private String mNumeFurnizorNir;
+    private String mLocalitateFurnizor;
 
     private ArrayList<Produs> mListaProduse = new ArrayList<>();;
 
@@ -113,9 +112,10 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
         Bundle bundle = getArguments();
         if (bundle != null) {
             mEditorMode = bundle.getBoolean(FRAGMENT_EDITOR_MODE);
-            if (bundle.containsKey(CUI_FURNIZOR) && bundle.containsKey(NUME_FURNIZOR)) {
+            if (bundle.containsKey(CUI_FURNIZOR) && bundle.containsKey(NUME_FURNIZOR) && bundle.containsKey(LOCALITATE_FURNIZOR)) {
                 mCuiFurnizorNir = bundle.getString(CUI_FURNIZOR);
                 mNumeFurnizorNir = bundle.getString(NUME_FURNIZOR);
+                mLocalitateFurnizor = bundle.getString(LOCALITATE_FURNIZOR);
                 mNumeFurnizor.setText(mNumeFurnizorNir);
             }
 
@@ -123,6 +123,7 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
                 getActivity().setTitle(R.string.editor_nir_title_edit_nir);
                 mNir = bundle.getParcelable(CLICKED_ITEM);
                 mCuiFurnizorNir = mNir.getCuiFurnizor();
+                mLocalitateFurnizor = mNir.getLocalitateFurnizor();
                 mNumeFurnizor.setText(mNir.getNumeFurnizor());
                 mNumeFurnizorNir = mNir.getNumeFurnizor();
                 mNumarNir.setText(String.valueOf(mNir.getNumar()));
@@ -203,6 +204,8 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
         if (mEditorMode) {
             MenuItem menuItem = menu.findItem(R.id.delete_nir);
             menuItem.setVisible(false);
+            menuItem = menu.findItem(R.id.save_nir_pdf);
+            menuItem.setVisible(false);
         }
     }
 
@@ -215,6 +218,14 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
 
             case R.id.delete_nir:
                 showDeleteConfirmationDialog();
+                return true;
+
+            case R.id.save_nir_pdf:
+                try {
+                    new PdfCreator(getContext(), mNir).makePdf();
+                } catch (IOException | DocumentException e) {
+                    e.printStackTrace();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -237,9 +248,9 @@ public class EditorNirFragment extends Fragment implements ProdusNirAdapter.Prod
             final Nir nir;
 
             if (mNir != null) {
-                nir = new Nir(mNir.getId(), numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
+                nir = new Nir(mNir.getId(), numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mLocalitateFurnizor, mListaProduse);
             } else {
-                nir = new Nir(numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mListaProduse);
+                nir = new Nir(numar, data, serieAct, numarAct, dataAct, mNumeFurnizorNir, mCuiFurnizorNir, mLocalitateFurnizor, mListaProduse);
             }
 
             AppExecutors.getsInstance().diskIO().execute(new Runnable() {

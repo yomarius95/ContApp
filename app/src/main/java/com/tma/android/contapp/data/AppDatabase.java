@@ -12,7 +12,7 @@ import com.tma.android.contapp.data.DAO.FurnizorDao;
 import com.tma.android.contapp.data.DAO.NirDao;
 import com.tma.android.contapp.data.DAO.ProdusDao;
 
-@Database(entities = {Produs.class, Nir.class, Furnizor.class}, version = 6, exportSchema = false)
+@Database(entities = {Produs.class, Nir.class, Furnizor.class}, version = 7, exportSchema = false)
 @TypeConverters({DateConverter.class, ArrayListConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 

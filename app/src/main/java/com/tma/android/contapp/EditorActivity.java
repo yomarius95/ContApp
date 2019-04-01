@@ -16,6 +16,7 @@ import butterknife.ButterKnife;
 import static com.tma.android.contapp.fragments.EditorNirFragment.INDEX_PRODUS_NIR;
 import static com.tma.android.contapp.fragments.EditorNirFragment.PRODUS_NIR_FRAGMENT;
 import static com.tma.android.contapp.fragments.FurnizorFragment.FURNIZOR_FRAGMENT;
+import static com.tma.android.contapp.fragments.NirFragment.LOCALITATE_FURNIZOR;
 import static com.tma.android.contapp.fragments.NirFragment.NIR_FRAGMENT;
 import static com.tma.android.contapp.fragments.NirFragment.NUME_FURNIZOR;
 import static com.tma.android.contapp.fragments.ProdusFragment.CUI_FURNIZOR;
@@ -60,6 +61,11 @@ public class EditorActivity extends AppCompatActivity {
             if (intent.hasExtra(NUME_FURNIZOR)) {
                 String numeFurnizorProdus = intent.getStringExtra(NUME_FURNIZOR);
                 bundle.putString(NUME_FURNIZOR, numeFurnizorProdus);
+            }
+
+            if (intent.hasExtra(LOCALITATE_FURNIZOR)) {
+                String localitateFurnizor = intent.getStringExtra(LOCALITATE_FURNIZOR);
+                bundle.putString(LOCALITATE_FURNIZOR, localitateFurnizor);
             }
 
             if (intent.hasExtra(CLICKED_ITEM)) {

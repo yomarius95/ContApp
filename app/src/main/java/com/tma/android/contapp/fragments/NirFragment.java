@@ -36,6 +36,7 @@ import static com.tma.android.contapp.fragments.ProdusFragment.CUI_FURNIZOR;
 public class NirFragment extends Fragment implements NirAdapter.NirItemClickListener {
     public static final String NIR_FRAGMENT = "nir_fragment";
     public static final String NUME_FURNIZOR = "nume_furnizor";
+    public static final String LOCALITATE_FURNIZOR = "localitate_furnizor";
 
     @BindView(R.id.fab_nir)
     FloatingActionButton fabNir;
@@ -49,6 +50,7 @@ public class NirFragment extends Fragment implements NirAdapter.NirItemClickList
     Spinner mSpinnerFurnizor;
     private String[] spinnerCuiArray;
     private String[] spinnerNameArray;
+    private String[] spinnerLocalitateArray;
     private int index = -1;
 
     public NirFragment() {
@@ -56,7 +58,7 @@ public class NirFragment extends Fragment implements NirAdapter.NirItemClickList
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_nir, container, false);
         ButterKnife.bind(this, rootView);
 
@@ -71,6 +73,7 @@ public class NirFragment extends Fragment implements NirAdapter.NirItemClickList
                 } else {
                     intent.putExtra(CUI_FURNIZOR, spinnerCuiArray[index]);
                     intent.putExtra(NUME_FURNIZOR, spinnerNameArray[index]);
+                    intent.putExtra(LOCALITATE_FURNIZOR, spinnerLocalitateArray[index]);
 
                     startActivity(intent);
                 }
@@ -102,10 +105,12 @@ public class NirFragment extends Fragment implements NirAdapter.NirItemClickList
                     public void run() {
                         spinnerNameArray = new String[furnizori.size()];
                         spinnerCuiArray = new String[furnizori.size()];
+                        spinnerLocalitateArray = new String[furnizori.size()];
 
                         for (int i = 0; i < furnizori.size(); i++) {
                             spinnerNameArray[i] = furnizori.get(i).getNume();
                             spinnerCuiArray[i] = furnizori.get(i).getCui();
+                            spinnerLocalitateArray[i] = furnizori.get(i).getLocalitate();
                         }
 
                         setupSpinner();

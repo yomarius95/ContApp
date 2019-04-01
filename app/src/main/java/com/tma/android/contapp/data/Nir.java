@@ -27,10 +27,11 @@ public class Nir implements Parcelable {
     private String dataAct;
     private String numeFurnizor;
     private String cuiFurnizor;
+    private String localitateFurnizor;
     private ArrayList<Produs> listaProduse;
 
     @Ignore
-    public Nir(int numar, String data, String serieAct, int numarAct, String dataAct, String numeFurnizor, String cuiFurnizor, ArrayList<Produs> listaProduse) {
+    public Nir(int numar, String data, String serieAct, int numarAct, String dataAct, String numeFurnizor, String cuiFurnizor, String localitateFurnizor, ArrayList<Produs> listaProduse) {
         this.numar = numar;
         this.data = data;
         this.serieAct = serieAct;
@@ -38,10 +39,11 @@ public class Nir implements Parcelable {
         this.dataAct = dataAct;
         this.numeFurnizor = numeFurnizor;
         this.cuiFurnizor = cuiFurnizor;
+        this.localitateFurnizor = localitateFurnizor;
         this.listaProduse = listaProduse;
     }
 
-    public Nir(int id, int numar, String data, String serieAct, int numarAct, String dataAct, String numeFurnizor, String cuiFurnizor, ArrayList<Produs> listaProduse) {
+    public Nir(int id, int numar, String data, String serieAct, int numarAct, String dataAct, String numeFurnizor, String cuiFurnizor, String localitateFurnizor, ArrayList<Produs> listaProduse) {
         this.id = id;
         this.numar = numar;
         this.data = data;
@@ -50,6 +52,7 @@ public class Nir implements Parcelable {
         this.dataAct = dataAct;
         this.numeFurnizor = numeFurnizor;
         this.cuiFurnizor = cuiFurnizor;
+        this.localitateFurnizor = localitateFurnizor;
         this.listaProduse = listaProduse;
     }
 
@@ -62,6 +65,7 @@ public class Nir implements Parcelable {
         dataAct = in.readString();
         numeFurnizor = in.readString();
         cuiFurnizor = in.readString();
+        localitateFurnizor = in.readString();
         if (in.readByte() == 0x01) {
             listaProduse = new ArrayList<>();
             in.readList(listaProduse, Produs.class.getClassLoader());
@@ -85,6 +89,7 @@ public class Nir implements Parcelable {
         dest.writeString(dataAct);
         dest.writeString(numeFurnizor);
         dest.writeString(cuiFurnizor);
+        dest.writeString(localitateFurnizor);
         if (listaProduse == null) {
             dest.writeByte((byte) (0x00));
         } else {
@@ -140,5 +145,9 @@ public class Nir implements Parcelable {
 
     public ArrayList<Produs> getListaProduse() {
         return listaProduse;
+    }
+
+    public String getLocalitateFurnizor() {
+        return localitateFurnizor;
     }
 }
